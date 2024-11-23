@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/22 16:28:44 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/23 19:57:56 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,17 @@
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	char		*buffer;
+	char		*result;
 	ssize_t		bytes_read;
-	size_t		i;
 
-	if (buffer != NULL)
-		free(buffer);
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (buffer == NULL)
-	{
-		printf("probleme allocation memoire!\n");
 		return (NULL);
-	}
-	bytes_read = read(fd, buffer, 1); 
-	printf("Contenu de buffer : %s\n", buffer);
-	if (bytes_read == -1)
-	{
-		printf("Erreur lors de la lecture.\n");
-		return(NULL);
-	}
-	i = 0;
-	buffer[bytes_read] = '\0';
-	while (buffer[i] != '\n' && buffer[i])
-		i++;
-	buffer[i + 1]= '\0';
-	return (buffer);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	result = get_next_string(bytes_read, buffer);
+	free(buffer);
+	return (result);
 }
 
 #include <fcntl.h>
@@ -55,17 +41,15 @@ int	main(void)
 		return (1);
 	}
 	file_content = get_next_line(fd);
-	if (file_content != NULL)
+	printf("%s", file_content);
+	while (file_content != NULL)
 	{
-		printf("Contenu du fichier : \n%s", file_content);
-		while (file_content)
-		{
-			file_content = get_next_line(fd);
-			printf("Contenu du fichier : %s", file_content);
-		}
-		free(file_content);
-		close(fd);
+		file_content = get_next_line(fd);
+		printf("%s", file_content);
 	}
+	printf("\n");
+	close(fd);
+	free(file_content);
 	return (0);
 }
 
