@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 11:46:08 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 12:24:15 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 15:58:15 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,24 @@ size_t	ft_strlen(char *str)
 	return (i);
 }
 
-char	*fill_tmp(char *str, char *tmp)
+char	*fill_tmp(char **str, char *tmp)
 {
 	size_t	i;
 
 	i = 0;
-	while (tmp[i])
+	while (tmp[i] != '\0')
 		i++;
-	while (*str)
+	while (**str)
 	{
-		tmp[i] = *str;
+		tmp[i] = **str;
 		if (tmp[i] == '\n')
 		{
 			tmp[i + 1] = '\0';
+			(*str)++;
 			return (tmp);
 		}
 		i++;
-		str++;
+		(*str)++;
 	}
 	tmp[i] = '\0';
 	return (tmp);
@@ -47,7 +48,7 @@ char	*fill_tmp(char *str, char *tmp)
 
 char	*ft_putstr(char *src, char *dest)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
 	while (src[i])
@@ -71,11 +72,10 @@ char	*ft_realloc(char *tmp)
 	ptr = ft_putstr(tmp, ptr);
 	if (tmp)
 		free(tmp);
-	tmp = NULL;
 	tmp = malloc((len_tmp + BUFFER_SIZE + 1) * sizeof(char));
 	if (tmp == NULL)
 		return (NULL);
-	ptr = ft_putstr(ptr, tmp);
+	tmp = ft_putstr(ptr, tmp);
 	if (ptr)
 		free(ptr);
 	return (tmp);
@@ -84,27 +84,27 @@ char	*ft_realloc(char *tmp)
 char	*get_buffer(char *buffer, char *str, ssize_t bytes_read, int fd)
 {
 	char	*tmp;
-	char	*del;
+	char	*ptr;
 
 	tmp = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (tmp == NULL)
 		return (NULL);
-	str = ft_putstr(buffer, str);
+	tmp[0] = '\0';
+	if (ft_strlen(str) == BUFFER_SIZE)
+		ptr = str;
 	while (bytes_read > 0)
 	{
-		tmp = fill_tmp(str, tmp);
+		tmp = fill_tmp(&str, tmp);
 		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (ft_strlen(str) < BUFFER_SIZE)
 		{
-			del = str;
-			free(del);
-			str = malloc((BUFFER_SIZE + 1) * sizeof(char));
-			if (str == NULL)
-				return (NULL);
+			return (tmp);
 		}
-		str = ft_putstr(buffer, str);
+		if (*str == '\0')
+		{
+			bytes_read = read(fd, buffer, BUFFER_SIZE);
+			str = ptr;
+			str = ft_putstr(buffer, str);
+		}
 		tmp = ft_realloc(tmp);
 	}
 	return (tmp);
@@ -119,6 +119,7 @@ char	*get_next_string(ssize_t bytes_read, char *buffer, int fd)
 		str = malloc((BUFFER_SIZE + 1) * sizeof(char));
 		if (str == NULL)
 			return (NULL);
+		str = ft_putstr(buffer, str);
 	}
 	if (bytes_read == -1)
 		return (NULL);
@@ -130,6 +131,8 @@ char	*get_next_string(ssize_t bytes_read, char *buffer, int fd)
 	}
 	else
 	{
+		if (ft_strlen(str) == BUFFER_SIZE)
+			str = ft_putstr(buffer, str);
 		return (get_buffer(buffer, str, bytes_read, fd));
 	}
 }

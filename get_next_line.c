@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 12:25:05 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 15:51:52 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ char	*get_next_line(int fd)
 	if (buffer == NULL)
 		return (NULL);
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	buffer[BUFFER_SIZE] = '\0';
 	result = get_next_string(bytes_read, buffer, fd);
 	if (buffer)
 		free(buffer);
@@ -43,14 +44,19 @@ int	main(void)
 	}
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
 	/* while (file_content != NULL)
