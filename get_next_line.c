@@ -6,83 +6,57 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 18:48:45 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 23:10:09 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-char	*get_buffer(char *buffer, char **str, ssize_t bytes_read, int fd)
+char	*free_and_move_index(char **str)
 {
-	char		*tmp;
-	static char	*ptr;
+	char	*temp;
+	int		index;
 
-	tmp = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (tmp == NULL)
-		return (NULL);
-	tmp[0] = '\0';
-	if (ptr == NULL)
-		ptr = *str;
-	if (ft_strlen(*str) < BUFFER_SIZE)
-	{
-		tmp = fill_tmp(str, tmp);
-		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		tmp = ft_realloc(tmp);
-		*str = ptr;
-		*str = ft_putstr(buffer, *str);
-	}
-	while (bytes_read > 0)
-	{
-		tmp = fill_tmp(str, tmp);
-		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		tmp = ft_realloc(tmp);
-		if (**str == '\0')
-		{
-			bytes_read = read(fd, buffer, BUFFER_SIZE);
-			*str = ptr;
-			*str = ft_putstr(buffer, *str);
-		}
-	}
-	return (tmp);
+	temp = malloc((ft_strlen(*str) + 1) * sizeof(char));
+	temp = ft_putstr(*str, temp, 0);
+	index = (ft_strchr(*str, '\n') + 1);
+	temp += index;
+	free(*str);
+	*str = malloc((ft_strlen(temp) + 1) * sizeof(char));
+	*str = ft_putstr(temp, *str, 0);
+	temp -= index;
+	free(temp);
+	return (*str);
 }
 
-char	*get_next_string(ssize_t bytes_read, char *buffer, int fd)
+char	*get_next_string(char **str, char *buffer, int fd, ssize_t bytes_read)
 {
-	static char	*str;
-	static char	*ptr;
+	char	*result;
+	(void) bytes_read;
 
-	if (str == NULL)
-	{
-		str = malloc((BUFFER_SIZE + 1) * sizeof(char));
-		if (str == NULL)
-			return (NULL);
-		ptr = str;
-		str[0] = '\0';
-	}
-	if (bytes_read == 0)
-	{
-		if (ptr)
-			free(ptr);
-		return (NULL);
-	}
+	if (*str[0] == '\0')
+		*str = ft_putstr(buffer, *str, 0);
 	else
 	{
-		if (ft_strlen(str) == BUFFER_SIZE)
-			str = ft_putstr(buffer, str);
-		if (*str == '\0')
-		{
-			str = ptr;
-			str = ft_putstr(buffer, str);
-		}
-		return (get_buffer(buffer, &str, bytes_read, fd));
+		*str = ft_realloc(*str);
+		*str = ft_putstr(buffer, *str, ft_strlen(*str));
 	}
+	while (ft_strchr(*str, '\n') == -1)
+	{
+		*str = ft_realloc(*str);
+		read(fd, buffer, BUFFER_SIZE);
+		*str = ft_putstr(buffer, *str, ft_strlen(*str));
+	}
+	result = malloc((ft_strchr(*str, '\n') + 2) * sizeof(char));
+	result = ft_putline(*str, result);
+	*str = free_and_move_index(str);
+	return (result);
 }
 
 char	*get_next_line(int fd)
 {
+	static char	*str;
 	char		*buffer;
 	char		*result;
 	ssize_t		bytes_read;
@@ -90,11 +64,18 @@ char	*get_next_line(int fd)
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (buffer == NULL)
 		return (NULL);
+	if (str == NULL)
+	{
+		str = malloc((BUFFER_SIZE + 1) * sizeof(char));
+		if (str == NULL)
+			return (NULL);
+		str[0] = '\0';
+	}
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
 	buffer[BUFFER_SIZE] = '\0';
 	if (bytes_read == -1)
 		return (NULL);
-	result = get_next_string(bytes_read, buffer, fd);
+	result = get_next_string(&str, buffer, fd, bytes_read);
 	if (buffer)
 		free(buffer);
 	return (result);
@@ -114,14 +95,19 @@ int	main(void)
 	}
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
-	while (file_content != NULL)
+	free(file_content);
+	file_content = get_next_line(fd);
+	printf("%s", file_content);
+	free(file_content);
+	file_content = get_next_line(fd);
+	printf("%s", file_content);
+	free(file_content);
+	/* while (file_content != NULL)
 	{
 		free(file_content);
 		file_content = get_next_line(fd);
 		printf("%s", file_content);
-	}
-	if (file_content)
-		free(file_content);
+	} */
 	printf("\n");
 	close(fd);
 	return (0);

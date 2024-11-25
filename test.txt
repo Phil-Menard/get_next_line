@@ -1,3 +1,17 @@
 faisons des phrases
 que va-t-on faire
 putain j'ai peur oula
+
+on peut realloc str jusqu'à prendre TOUT le fichier au fur et a mesure?
+static str
+
+str = fai|son|s d|es |phr|ase|s\nq
+int	strchr => \n dans str? oui ! (return index?)
+ptr = fai|son|s d|es |phr|ase|s\n (str jusqu'à \n)
+str += index
+
+str = q|ue |va-|t-o|n f|air|e\np
+int	strchr => \n dans str? oui ! (return index?)
+ptr = q|ue |va-|t-o|n f|air|e\n (str jusqu'à \n)
+str += index
+...
