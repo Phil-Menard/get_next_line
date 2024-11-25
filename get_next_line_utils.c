@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 11:46:08 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 17:28:23 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 18:19:36 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,75 +79,4 @@ char	*ft_realloc(char *tmp)
 	if (ptr)
 		free(ptr);
 	return (tmp);
-}
-
-char	*get_buffer(char *buffer, char **str, ssize_t bytes_read, int fd)
-{
-	char		*tmp;
-	static char	*ptr;
-
-	tmp = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (tmp == NULL)
-		return (NULL);
-	tmp[0] = '\0';
-	if (ptr == NULL)
-		ptr = *str;
-	if (**str == '\0')
-	{
-		*str = ptr;
-		*str = ft_putstr(buffer, *str);
-	}
-	if (ft_strlen(*str) < BUFFER_SIZE)
-	{
-		tmp = fill_tmp(str, tmp);
-		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		tmp = ft_realloc(tmp);
-		*str = ptr;
-		*str = ft_putstr(buffer, *str);
-	}
-	while (bytes_read > 0)
-	{
-		tmp = fill_tmp(str, tmp);
-		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		tmp = ft_realloc(tmp);
-		if (**str == '\0')
-		{
-			bytes_read = read(fd, buffer, BUFFER_SIZE);
-			*str = ptr;
-			*str = ft_putstr(buffer, *str);
-		}
-	}
-	return (tmp);
-}
-
-char	*get_next_string(ssize_t bytes_read, char *buffer, int fd)
-{
-	static char	*str;
-	static char	*ptr;
-
-	if (str == NULL)
-	{
-		str = malloc((BUFFER_SIZE + 1) * sizeof(char));
-		if (str == NULL)
-			return (NULL);
-		ptr = str;
-		str[0] = '\0';
-		str = ft_putstr(buffer, str);
-	}
-	if (bytes_read == -1)
-		return (NULL);
-	else if (bytes_read == 0)
-	{
-		if (ptr)
-			free(ptr);
-		return (NULL);
-	}
-	else
-	{
-		if (ft_strlen(str) == BUFFER_SIZE)
-			str = ft_putstr(buffer, str);
-		return (get_buffer(buffer, &str, bytes_read, fd));
-	}
 }
