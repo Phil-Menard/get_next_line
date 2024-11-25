@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 11:46:08 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 17:13:49 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 17:28:23 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,18 +97,27 @@ char	*get_buffer(char *buffer, char **str, ssize_t bytes_read, int fd)
 		*str = ptr;
 		*str = ft_putstr(buffer, *str);
 	}
+	if (ft_strlen(*str) < BUFFER_SIZE)
+	{
+		tmp = fill_tmp(str, tmp);
+		if (tmp[ft_strlen(tmp) - 1] == '\n')
+			return (tmp);
+		tmp = ft_realloc(tmp);
+		*str = ptr;
+		*str = ft_putstr(buffer, *str);
+	}
 	while (bytes_read > 0)
 	{
+		tmp = fill_tmp(str, tmp);
+		if (tmp[ft_strlen(tmp) - 1] == '\n')
+			return (tmp);
+		tmp = ft_realloc(tmp);
 		if (**str == '\0')
 		{
 			bytes_read = read(fd, buffer, BUFFER_SIZE);
 			*str = ptr;
 			*str = ft_putstr(buffer, *str);
 		}
-		tmp = fill_tmp(str, tmp);
-		if (tmp[ft_strlen(tmp) - 1] == '\n')
-			return (tmp);
-		tmp = ft_realloc(tmp);
 	}
 	return (tmp);
 }
