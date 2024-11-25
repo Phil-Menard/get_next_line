@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 15:51:52 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/25 17:12:41 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	main(void)
 	free(file_content);
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
+	free(file_content);
 	/* while (file_content != NULL)
 	{
 		file_content = get_next_line(fd);
@@ -66,7 +67,6 @@ int	main(void)
 	} */
 	printf("\n");
 	close(fd);
-	free(file_content);
 	return (0);
 }
 
