@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:44 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/26 11:25:25 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/26 11:53:29 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ size_t	ft_strlen(char *str);
 int		ft_strchr(char *src, int c);
 char	*ft_putstr(char *src, char *dest, int i);
 char	*ft_putline(char *src, char *dest);
-char	*ft_realloc(char *tmp);
+char	*ft_realloc(char *str, char *buffer);
 
 #endif

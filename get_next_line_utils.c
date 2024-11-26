@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 11:46:08 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/26 10:20:54 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/26 11:53:24 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,13 @@ char	*ft_putstr(char *src, char *dest, int i)
 	return (dest);
 }
 
-char	*ft_realloc(char *str)
+char	*ft_realloc(char *str, char *buffer)
 {
 	size_t	len_str;
 	char	*new_str;
 
 	len_str = ft_strlen(str);
-	new_str = malloc((len_str + BUFFER_SIZE + 1) * sizeof(char));
+	new_str = malloc((len_str + ft_strlen(buffer) + 1) * sizeof(char));
 	if (new_str == NULL)
 		return (NULL);
 	if (str)
