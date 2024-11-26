@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 11:46:08 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 22:24:12 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/26 10:20:54 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ char	*ft_putline(char *src, char *dest)
 	int	i;
 
 	i = 0;
+	if (src[0] == '\0')
+		return (NULL);
 	while (src[i] != '\n')
 	{
 		dest[i] = src[i];

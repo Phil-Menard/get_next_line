@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/25 23:10:09 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/26 10:58:03 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,22 +33,26 @@ char	*free_and_move_index(char **str)
 char	*get_next_string(char **str, char *buffer, int fd, ssize_t bytes_read)
 {
 	char	*result;
-	(void) bytes_read;
 
-	if (*str[0] == '\0')
-		*str = ft_putstr(buffer, *str, 0);
-	else
+	if (bytes_read == 0 && **str == '\0')
+	{
+		free(*str);
+		return(NULL);
+	}
+	if (bytes_read > 0)
 	{
 		*str = ft_realloc(*str);
 		*str = ft_putstr(buffer, *str, ft_strlen(*str));
 	}
-	while (ft_strchr(*str, '\n') == -1)
+	while (ft_strchr(*str, '\n') == -1 && bytes_read > 0)
 	{
 		*str = ft_realloc(*str);
-		read(fd, buffer, BUFFER_SIZE);
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		*str = ft_putstr(buffer, *str, ft_strlen(*str));
 	}
 	result = malloc((ft_strchr(*str, '\n') + 2) * sizeof(char));
+	if (!result)
+		return (NULL);
 	result = ft_putline(*str, result);
 	*str = free_and_move_index(str);
 	return (result);
@@ -64,6 +68,10 @@ char	*get_next_line(int fd)
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (buffer == NULL)
 		return (NULL);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	buffer[BUFFER_SIZE] = '\0';
+	if (bytes_read == -1)
+		return (NULL);
 	if (str == NULL)
 	{
 		str = malloc((BUFFER_SIZE + 1) * sizeof(char));
@@ -71,10 +79,6 @@ char	*get_next_line(int fd)
 			return (NULL);
 		str[0] = '\0';
 	}
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	buffer[BUFFER_SIZE] = '\0';
-	if (bytes_read == -1)
-		return (NULL);
 	result = get_next_string(&str, buffer, fd, bytes_read);
 	if (buffer)
 		free(buffer);
@@ -95,20 +99,14 @@ int	main(void)
 	}
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
-	free(file_content);
-	file_content = get_next_line(fd);
-	printf("%s", file_content);
-	free(file_content);
-	file_content = get_next_line(fd);
-	printf("%s", file_content);
-	free(file_content);
-	/* while (file_content != NULL)
+	while (file_content != NULL)
 	{
 		free(file_content);
 		file_content = get_next_line(fd);
 		printf("%s", file_content);
-	} */
+	}
 	printf("\n");
+	free(file_content);
 	close(fd);
 	return (0);
 }
