@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/26 14:45:29 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/27 10:58:32 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@ char	*free_and_move_index(char **str)
 
 	temp = malloc((ft_strlen(*str) + 1) * sizeof(char));
 	temp = ft_putstr(*str, temp, 0);
-	index = (ft_strchr(*str, '\n') + 1);
+	if (ft_strchr(*str, '\n') != -1)
+		index = (ft_strchr(*str, '\n') + 1);
+	else
+		index = ft_strlen(*str);
 	temp += index;
 	free(*str);
 	*str = malloc((ft_strlen(temp) + 1) * sizeof(char));
@@ -33,7 +36,6 @@ char	*free_and_move_index(char **str)
 char	*is_newline(char **str)
 {
 	char	*result;
-
 	if (ft_strchr(*str, '\n') != -1)
 	{
 		result = malloc((ft_strchr(*str, '\n') + 2) * sizeof(char));
@@ -68,9 +70,12 @@ char	*get_next_string(char **str, char *buffer, int fd, ssize_t bytes_read)
 	}
 	while (ft_strchr(*str, '\n') == -1 && bytes_read > 0)
 	{
-		*str = ft_realloc(*str, buffer);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		*str = ft_putstr(buffer, *str, ft_strlen(*str));
+		if (bytes_read > 0)
+		{
+			*str = ft_realloc(*str, buffer);
+			*str = ft_putstr(buffer, *str, ft_strlen(*str));
+		}
 	}
 	return (is_newline(str));
 }
@@ -82,7 +87,7 @@ char	*set_str(char *str, char **buffer, ssize_t bytes_read)
 		free(*buffer);
 		return (NULL);
 	}
-	str = malloc((ft_strlen(*buffer) + 1) * sizeof(char));
+	str = malloc((bytes_read + 1) * sizeof(char));
 	if (str == NULL)
 		return (NULL);
 	str[0] = '\0';
@@ -106,6 +111,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	buffer[bytes_read] = '\0';
+	//printf("buffer : %s\n", buffer);
 	if (str == NULL)
 	{
 		str = set_str(str, &buffer, bytes_read);
