@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 10:58:30 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/27 10:58:32 by pmenard          ###   ########.fr       */
+/*   Updated: 2024/11/27 13:38:43 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@ char	*free_and_move_index(char **str)
 	int		index;
 
 	temp = malloc((ft_strlen(*str) + 1) * sizeof(char));
+	if (temp == NULL)
+	{
+		free(*str);
+		return (NULL);
+	}
 	temp = ft_putstr(*str, temp, 0);
 	if (ft_strchr(*str, '\n') != -1)
 		index = (ft_strchr(*str, '\n') + 1);
@@ -36,6 +41,7 @@ char	*free_and_move_index(char **str)
 char	*is_newline(char **str)
 {
 	char	*result;
+
 	if (ft_strchr(*str, '\n') != -1)
 	{
 		result = malloc((ft_strchr(*str, '\n') + 2) * sizeof(char));
@@ -71,6 +77,7 @@ char	*get_next_string(char **str, char *buffer, int fd, ssize_t bytes_read)
 	while (ft_strchr(*str, '\n') == -1 && bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		buffer[bytes_read] = '\0';
 		if (bytes_read > 0)
 		{
 			*str = ft_realloc(*str, buffer);
@@ -111,7 +118,6 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	buffer[bytes_read] = '\0';
-	//printf("buffer : %s\n", buffer);
 	if (str == NULL)
 	{
 		str = set_str(str, &buffer, bytes_read);
@@ -127,9 +133,8 @@ char	*get_next_line(int fd)
 /* #include <fcntl.h>
 int	main(void)
 {
-	int		fd;
 	char	*file_content;
-	int		i;
+	int		fd;
 
 	fd = open("test.txt", O_RDONLY);
 	if (fd == -1)
@@ -139,18 +144,22 @@ int	main(void)
 	}
 	file_content = get_next_line(fd);
 	printf("%s", file_content);
-	i = 0;
-	while (file_content != NULL && i < 10)
+	while (file_content != NULL)
 	{
 		free(file_content);
 		file_content = get_next_line(fd);
 		printf("%s", file_content);
-		i++;
 	}
 	printf("\n");
 	free(file_content);
-	close(fd);
+	close(fd); 
+
+	printf("Entrez du texte (Ctrl+D pour terminer) :\n");
+	while ((file_content = get_next_line(STDIN_FILENO)) != NULL)
+	{
+		write(STDOUT_FILENO, "Vous avez tapé : ", 18);
+		printf("%s", file_content);
+		free(file_content);
+	}
 	return (0);
 } */
-
-// read() => ssize_t read(int fd, void *buf, size_t count);
